@@ -1,0 +1,99 @@
+\section{Appendix}
+\label{sec:appendix}
+
+
+\subsection{OpenBrew Platform Data Collection}
+\label{sec:openbrew_platform_data_collection}
+
+\begin{lstlisting}[caption={Example of collected platform data}, label={lst:openbrew_data}, basicstyle=\ttfamily\footnotesize, frame=single, backgroundcolor=\color{gray!10}, breaklines=true]
+{
+    "users": [
+        {
+            "id": "user123",
+            "username": "coffee_lover",
+            "role": "enthusiast"
+        },
+        {...},
+        {
+            "id": "user101",
+            "username": "roastmaster",
+            "role": "roaster"
+        }
+    ],
+    "posts": [
+        {
+            "id": "post456",
+            "user_id": "user123",
+            "content": "Just brewed a delicious cup of coffee!",
+            "timestamp": "2024-04-01T12:00:00Z",
+            "upvotes": 10,
+            "downvotes": 2,
+            "upvoted_by": ["user456", ..., "user789"],
+            "downvoted_by": ["user101"],
+            "comments": [
+                {
+                    "user_id": "user456",
+                    "content": "What beans did you use?",
+                    "timestamp": "2024-04-01T12:05:00Z",
+                    "upvotes": 3,
+                    "downvotes": 0,
+                    "upvoted_by": [...],
+                    "downvoted_by": [],
+                    "comments": [
+                        {
+                            "user_id": "user789",
+                            "content": "I bet it was Ethiopian!",
+                            "timestamp": "2024-04-01T12:06:00Z",
+                            "upvotes": 1,
+                            ...,
+                            "comments": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+\end{lstlisting}
+
+\newpage
+\begin{lstlisting}[caption={Example output from the basic statistics API}, label={lst:openbrew_basic_stats}, basicstyle=\ttfamily\footnotesize, frame=single, backgroundcolor=\color{gray!10}, breaklines=true]
+{
+  "start_time": "2024-01-01T00:00:00Z",
+  "end_time": "2024-01-31T23:59:59Z",
+  "number_of_users": 152,
+  "number_of_brews": 8,
+  "number_of_posts": 412,
+  "number_of_comments": 1297
+}
+\end{lstlisting}
+
+\subsection{Pseudocode for Constructing Network Graphs}
+\label{sec:pseudocode_for_constructing_network_graphs}
+
+\subsubsection{Votes Graph Construction}
+\begin{lstlisting}[language=Python, caption={Pseudocode for Votes Graph Construction}, basicstyle=\ttfamily\footnotesize, frame=single, backgroundcolor=\color{gray!10}, breaklines=true]
+For each user in users:
+    Add node to graph with user id and role
+
+For each post in posts:
+    For each user in post.upvoted_by:
+        If user != post.user_id:
+            Add or update directed edge (user -> post.user_id) with +1 weight and timestamp
+    For each user in post.downvoted_by:
+        If user != post.user_id:
+            Add or update directed edge (user -> post.user_id) with -1 weight and timestamp
+    Recursively process comments as posts
+\end{lstlisting}
+
+\subsubsection{Comments Graph Construction}
+\begin{lstlisting}[language=Python, caption={Pseudocode for Comments Graph Construction}, basicstyle=\ttfamily\footnotesize, frame=single, backgroundcolor=\color{gray!10}, breaklines=true]
+For each user in users:
+    Add node to graph with user id and role
+
+For each post in posts:
+    Recursively process comments:
+        For each comment:
+            Add or update directed edge (comment.user_id -> parent_author_id) with +1 weight and timestamp
+            Recursively process nested comments (parent_author_id = comment.user_id)
+\end{lstlisting}
