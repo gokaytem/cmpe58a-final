@@ -45,7 +45,7 @@ Use a predictable structure:
 
 ```text
 C:\src\zlib-1.3.1
-C:\src\hdf5-1.14.x
+C:\src\hdf5-1.14.6
 C:\src\matio-1.5.30
 
 C:\build\zlib-vs
@@ -95,8 +95,10 @@ Expected outputs:
 
 ```text
 C:\deps\zlib\include
-C:\deps\zlib\lib\zlibstatic.lib   (or zlib.lib, depending on project naming)
+C:\deps\zlib\lib\zlibstatic.lib
 ```
+
+If your zlib build produces `zlib.lib` instead, use that exact filename consistently in later `ZLIB_LIBRARY` and linker settings.
 
 ---
 
@@ -105,7 +107,7 @@ C:\deps\zlib\lib\zlibstatic.lib   (or zlib.lib, depending on project naming)
 ### 5.1 CMake GUI Steps
 
 1. Open **CMake GUI**.
-2. Source: `C:/src/hdf5-1.14.x`
+2. Source: `C:/src/hdf5-1.14.6`
 3. Build: `C:/build/hdf5-vs`
 4. **Configure** with Visual Studio x64 generator.
 5. Set:
@@ -121,7 +123,7 @@ C:\deps\zlib\lib\zlibstatic.lib   (or zlib.lib, depending on project naming)
 ### 5.2 Equivalent Command-Line Steps
 
 ```bat
-cmake -S C:\src\hdf5-1.14.x -B C:\build\hdf5-vs ^
+cmake -S C:\src\hdf5-1.14.6 -B C:\build\hdf5-vs ^
   -G "Visual Studio 16 2019" -A x64 ^
   -DCMAKE_INSTALL_PREFIX=C:\deps\hdf5 ^
   -DBUILD_SHARED_LIBS=OFF ^
@@ -157,7 +159,7 @@ C:\deps\hdf5\lib\hdf5_hl.lib
    - `MATIO_SHARED = OFF` (or `BUILD_SHARED_LIBS = OFF` if `MATIO_SHARED` is not present)
    - `ZLIB_INCLUDE_DIR = C:/deps/zlib/include`
    - `ZLIB_LIBRARY = C:/deps/zlib/lib/zlibstatic.lib`
-   - `HDF5_DIR = C:/deps/hdf5/cmake/hdf5` (if not found, try `C:/deps/hdf5/lib/cmake/hdf5`)
+   - `HDF5_DIR = C:/deps/hdf5/cmake/hdf5` (set this to the folder containing `HDF5Config.cmake`)
 6. Re-run **Configure** until all dependency variables resolve.
 7. Click **Generate**.
 8. Open generated `matio.sln`.
@@ -179,6 +181,12 @@ cmake -S C:\src\matio-1.5.30 -B C:\build\matio-vs ^
 
 cmake --build C:\build\matio-vs --config Release
 cmake --build C:\build\matio-vs --config Release --target INSTALL
+```
+
+If CMake cannot locate HDF5, find `HDF5Config.cmake` and use its parent directory for `-DHDF5_DIR`:
+
+```bat
+dir /s /b C:\deps\hdf5\HDF5Config.cmake
 ```
 
 Expected outputs:
